@@ -19,6 +19,25 @@ player_speed = 5
 obstacle_width, obstacle_height = 50, 50
 obstacle_speed = 5
 
+class Score: 
+    """
+    障害物をよけたらスコアとして表示するクラス
+    こうかとん：1点
+    障害物：10点
+    """
+    def __init__(self):
+        self.value = 0
+        self.font = pg.font.Font(None, 50) 
+        self.color = (0, 0, 255)
+        self.image = self.font.render(f"Score: {self.value}", 0, self.color)
+        self.rect = self.image.get_rect()
+        self.rect.center = 100, HEIGHT-50
+
+    def update(self, screen: pg.Surface):
+        self.image = self.font.render(f"Score: {self.value}", 0, self.color)
+        screen.blit(self.image, self.rect)
+
+
 def draw_player(x, y):
     pg.draw.rect(screen, WHITE, [x, y, player_width, player_height])
 def draw_obstacle(x, y):
@@ -28,6 +47,8 @@ def game():
 
     obstacles = []
     score = 0
+    score = Score()
+    score.update(screen)
 
     while True:
         for event in pg.event.get():
