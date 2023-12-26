@@ -37,7 +37,7 @@ def game():
         keys = pg.key.get_pressed()
         player_x += (keys[pg.K_RIGHT] - keys[pg.K_LEFT]) * player_speed
 
-        player_x = max(0, min(WIDTH - player_width, player_x))
+        player_y = max(0, min(WIDTH - player_width, player_x))
 
         if random.randint(1, 10) == 1:
             obstacle_x = random.randint(0, WIDTH - obstacle_width)
