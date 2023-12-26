@@ -96,6 +96,7 @@ def main():
     car = Car()  # 車（プレイヤー）のインスタンス生成
     clock =pg.time.Clock()
 
+
     obstacles = []
     score = 0
     obstacle_timer = 0
@@ -156,3 +157,8 @@ if __name__ == "__main__":
     main()
     pg.quit()
     sys.exit()
+
+    # フレームレートの制御
+    clock.tick(30)
+    
+
