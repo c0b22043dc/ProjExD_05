@@ -1,112 +1,110 @@
+import os
 import pygame as pg
 import random
 import sys
 
-pg.init()
+WIDTH = 400  # ゲームウィンドウの幅
+HEIGHT = 600  # ゲームウィンドウの高さ
 
-WIDTH, HEIGHT = 400, 600  # ゲームウィンドウの幅,高さ
-screen = pg.display.set_mode((WIDTH, HEIGHT))
-pg.display.set_caption("車ゲーム")
-
+BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 
-player_width, player_height = 50, 50
+#player_width, player_height = 50, 50
 #player_x = WIDTH // 2 - player_width // 2
 #player_y = HEIGHT - player_height -20
-player_speed = 5
+#player_speed = 5
 
-obstacle_width, obstacle_height = 50, 50
-obstacle_speed = 5
+#obstacle_width, obstacle_height = 50, 50
+#obstacle_speed = 5
 
-
-#def draw_player(x, y):
-    #pg.draw.rect(screen, WHITE, [x, y, player_width, player_height])
-    #rect = self.image.get_rect()
-def draw_obstacle(x, y):
-    pg.draw.rect(screen, RED, [x, y, obstacle_width, obstacle_height])
-
+def check_bound(obj_rct: pg.Rect):
+    """
+    オブジェクトが画面内か判定する関数
+    引数：なんらかの画像SurfaceのRect（主に車）
+    戻り値：横方向のはみ出し判定の結果（画面内：True/画面外：False）
+    """
+    yoko = True
+    if obj_rct.left < 0 or WIDTH < obj_rct.right:
+        yoko = False
+    return yoko
 
 class Car:
     """
-    プレイヤー（車）に関するクラス
+    車（プレイヤー）に関するクラス
     """
     delta = {  # 押下キーと移動量の辞書
-        pg.K_LEFT: (-1, 0),
-        pg.K_RIGHT: (+1, 0)
+        pg.K_RIGHT:+5,
+        pg.K_LEFT:-5
     }
 
-    def __init__(self, player_x, player_y):
+    def __init__(self):
         """
-        車の画像surfaceを生成する
+        車（プレイヤー）画像Surfaceを生成する
         """
-        self.image = pg.image.load("ex05/fig/car.png")  # 車画像ロード
-        self.rct = self.image.get_rect()
-        self.rct.center = player_x, player_y
+        super().__init__()
+        self.img = pg.transform.rotozoom(pg.image.load("ex05/fig/car.png"),0,0.17)
+        self.rct = self.img.get_rect()
+        self.rct.center = 200, 530  # プレイヤーの初期位置
 
-    def update(self, key_lst: list[bool]):
+    def update(self,screen: pg.Surface, keys):
         """
-        押下キーに応じてプレイヤー（車）を左右に移動させる
-        引数1 key_lst：押下キーの真理値リスト
-        引数2 screen：画面Surface
+        押下キーに応じて車（プレイヤー）を移動させる
+        引数1 screen：画面Surface
+        引数2 keys：押下キーのリスト
         """
-        sum_mv = [0, 0]
-        for k, mv in __class__.delta.items():
-            if key_lst[k]:
-                sum_mv[0] += mv[0]
-                sum_mv[1] += mv[1]
+        sum_mv = 0
+        for k , mv in __class__.delta.items():
+            if keys[k]:
+                sum_mv += mv
+        self.rct.move_ip(sum_mv,0)
+        if check_bound(self.rct) != True:
+            self.rct.move_ip(-sum_mv,0)
+        screen.blit(self.img, self.rct)
 
-
-def game():
-    clock = pg.time.Clock()
-    car = Car(WIDTH/2, HEIGHT/2)
-    global player_x
+def main():
+    pg.display.set_caption("車ゲーム")
+    screen = pg.display.set_mode((WIDTH, HEIGHT))
+    car = Car()  # 車（プレイヤー）のインスタンス生成
+    clock =pg.time.Clock()
 
     obstacles = []
     score = 0
 
     while True:
+        keys = pg.key.get_pressed()
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                pg.quit()
-                sys.exit()
-        keys = pg.key.get_pressed()
-        #player_x += (keys[pg.K_RIGHT] - keys[pg.K_LEFT]) * player_speed
+                return
+        
+        #if random.randint(1, 10) == 1:
+            #obstacle_x = random.randint(0, WIDTH - obstacle_width)
+            #obstacle_y = -obstacle_height
+            #obstacles.append([obstacle_x, obstacle_y])
 
-        #player_x = max(0, min(WIDTH - player_width, player_x))
+        #for obstacle in obstacles:
+            #obstacle[1] +- obstacle_speed
+            #if(
+                #player_x < obstacle[0] + obstacle_width
+                #and player_x + player_width > obstacle[0]
+                #and player_y < obstacle[1] + obstacle_height
+                #and player_y + player_height > obstacle[1]
+            #):
+                #print(f"Game Over! Score: {score}")
 
-        if random.randint(1, 10) == 1:
-            obstacle_x = random.randint(0, WIDTH - obstacle_width)
-            obstacle_y = -obstacle_height
-            obstacles.append([obstacle_x, obstacle_y])
+        screen.fill(BLACK)  # 仮の背景
+        car.update(screen, keys)
 
-        for obstacle in obstacles:
-            obstacle[1] +- obstacle_speed
-            if(
-                player_x < obstacle[0] + obstacle_width
-                and player_x + player_width > obstacle[0]
-                and player_y < obstacle[1] + obstacle_height
-                and player_y + player_height > obstacle[1]
-            ):
-                print(f"Game Over! Score: {score}")
-                pg.quit()
-                sys.exit()
-
-        screen.fill((0, 0, 0))
-
-        #draw_player(player_x, player_y)
-        car.update()
-
-
-        for obstacle in obstacles:
-            draw_obstacle(obstacle[0], obstacle[1])
+        #for obstacle in obstacles:
+            #draw_obstacle(obstacle[0], obstacle[1])
 
         score += 1
 
-        pg.display.flip()
-
+        pg.display.update()
         clock.tick(30)
 
 if __name__ == "__main__":
-    game()
-        
+    pg.init()
+    main()
+    pg.quit()
+    sys.exit()
