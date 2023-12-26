@@ -25,6 +25,7 @@ player_x = WIDTH // 2 - player_width // 2
 player_y = HEIGHT - player_height - 20
 player_speed = 5
 
+#障害物の初期設定
 obstacle_width, obstacle_height = 50, 50
 obstacle_speed = 5
 obstacle_interval = 5 * 30  # ５秒毎に障害物を生成
