@@ -96,6 +96,7 @@ def main():
         draw_player(player_x, player_y)
         score += 1
 
+
         pg.display.flip()
 
         clock.tick(30)
