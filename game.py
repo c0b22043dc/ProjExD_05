@@ -81,3 +81,4 @@ while True:
 
     # フレームレートの制御
     clock.tick(30)
+    
